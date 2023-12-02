@@ -67,7 +67,7 @@ const SearchScreen = () => {
   const [latFromUI, setLatFromUI] = useState(0);
   const [lngFromUI, setLngFromUI] = useState(0);
 
-  
+  // state variable to store students
   const [carCity, setCarCity] = useState('');
   const [carData, setCarData] = useState([]);
   const [carDataIsFetched, setCarDataIsFetched] = useState(false);
@@ -85,7 +85,7 @@ const SearchScreen = () => {
     doReverseGeocode();
     getAllData();
     // getCarDataFromDb();
-  },[]);
+  }, []);
 
   const getCarDataFromDb = async () => {
     console.log('ok');
@@ -96,7 +96,7 @@ const SearchScreen = () => {
       where('address', '==', carCity)
     );
 
-
+    // const q = query(collection(db, "students"), where("gpa", ">=", 2.5));
 
     // 3. execute the query
     try {
@@ -129,7 +129,7 @@ const SearchScreen = () => {
 
       const resultsFromFirestore = [];
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, ' => ', doc.data());
+        // console.log(doc.id, ' => ', doc.data());
         // make the object to add to the array
         const itemToAdd = {
           id: doc.id,
@@ -140,7 +140,7 @@ const SearchScreen = () => {
       });
 
       console.log('What is in our final array');
-      console.log(resultsFromFirestore);
+      // console.log(resultsFromFirestore);
       setCarData(resultsFromFirestore);
     } catch (err) {
       console.log(err);
@@ -192,13 +192,14 @@ const SearchScreen = () => {
       console.log(err);
     }
 
-    alert('Request Submitted. The data will be updated in your Reservations');
+    alert('Request Submitted. Your request has been sent for approval.');
     console.log(randomDate);
   };
 
   const getCurrentLocation = async () => {
     try {
       // 1. get permissions
+      console.log("sss")
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         alert(`Permission to access location was denied`);
@@ -320,16 +321,17 @@ const SearchScreen = () => {
                               setModalOpen(false);
                             }}
                             style={{
-                              marginBottom: 30,
+                              // marginBottom: 30,
+                              marginTop: 50,
                               padding: 10,
-                              alignSelf: 'center',
+                              alignSelf: 'flex-start',
                             }}
                           />
                           <Image
                             source={{ uri: carDetail.photo }}
                             style={{
                               width: '100%',
-                              height: 275,
+                              height: 230,
                               resizeMode: 'contain',
                               marginVertical: 10,
                             }}
