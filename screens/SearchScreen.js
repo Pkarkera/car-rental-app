@@ -12,6 +12,7 @@ import {
 import * as Location from 'expo-location';
 import { ScrollView } from 'react-native-gesture-handler';
 import MapView, { Marker } from 'react-native-maps';
+// Change these import statements in SearchScreen.js and App.js
 
 // import the db variable from firebaseConfig.js
 import { db } from '../firebaseConfig';
@@ -79,7 +80,6 @@ const SearchScreen = () => {
 
   const [carDetail, setCarDetail] = useState({});
 
-
   useEffect(() => {
     getCurrentLocation();
     doReverseGeocode();
@@ -113,7 +113,7 @@ const SearchScreen = () => {
       // 2. update the state variable with the contents of the temp array
       setCarData(temp);
 
-      console.log(`====>>> ${JSON.stringify(temp)}`);
+      // console.log(`====>>> ${JSON.stringify(temp)}`);
 
       // console.log('ok');
       // console.log(`+++++++++++++++++${temp}`);
@@ -148,8 +148,8 @@ const SearchScreen = () => {
   };
 
   const clickMe = (car) => {
-    console.log('MAP MARKER CLICKED');
-    console.log(car.name);
+    // console.log('MAP MARKER CLICKED');
+    // console.log(car.name);
     setCarDetail(car);
 
     setModalOpen(true);
@@ -186,20 +186,23 @@ const SearchScreen = () => {
         saveCarInUserDb
       );
       // display success message
-      console.log('Document written with ID: ', insertedDocument.id);
-      console.log(`done! ${insertedDocument.id}`);
+      // console.log('Document written with ID: ', insertedDocument.id);
+      // console.log(`done! ${insertedDocument.id}`);
     } catch (err) {
       console.log(err);
     }
 
-    alert('Request Submitted. Your request has been sent for approval.');
-    console.log(randomDate);
+    alert('Booking Request Submitted.');
+    // console.log(randomDate);
+    //setSelectedCar(null);
   };
+
+
 
   const getCurrentLocation = async () => {
     try {
       // 1. get permissions
-      console.log("sss")
+      // console.log("sss")
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         alert(`Permission to access location was denied`);
@@ -209,8 +212,8 @@ const SearchScreen = () => {
       // - The first time, this can take 5-30 seconds to complete
       let location = await Location.getCurrentPositionAsync();
 
-      console.log(`The current location is:`);
-      console.log(location);
+      // console.log(`The current location is:`);
+      // console.log(location);
       setDeviceLocation(location);
       setLatFromUI(location.coords.latitude);
       setLngFromUI(location.coords.longitude);
@@ -239,7 +242,7 @@ const SearchScreen = () => {
         // alert('No results found.');
         return;
       }
-      console.log(result.city);
+      // console.log(result.city);
       setCarCity(result.city);
       // alert(JSON.stringify(result));
 
@@ -279,8 +282,8 @@ const SearchScreen = () => {
                 // for each item in the array, execute this function code
                 // - build a marker element
                 // DEBUG
-                console.log(`Loop iteration: ${pos}`);
-                console.log(currItem);
+                // console.log(`Loop iteration: ${pos}`);
+                // console.log(currItem);
 
                 const coords = {
                   latitude: currItem.coordinates.lat,
@@ -354,6 +357,7 @@ const SearchScreen = () => {
                           <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
                             License PLate:{carDetail.licencePlate}
                           </Text>
+                          
                           <Pressable
                             style={{
                               borderWidth: 1,
@@ -372,9 +376,11 @@ const SearchScreen = () => {
                                 fontWeight: '700',
                               }}
                             >
-                              Book Now
+                              Reserve Now
                             </Text>
                           </Pressable>
+
+                          
                         </View>
                       </Modal>
                     </View>

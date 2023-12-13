@@ -5,6 +5,7 @@ import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
 import { auth } from '../firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
+
 const RegisterScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -19,12 +20,9 @@ const RegisterScreen = ({ navigation }) => {
         password
       );
       // who is the current user?
-      console.log('Who is the currently logged in user');
-      console.log(auth.currentUser);
       // alert(`Login success! ${auth.currentUser.uid}`);
       navigation.navigate('Rent A Car');
     } catch (err) {
-      console.log('ooohh')
       console.log(err);
     }
   };

@@ -29,19 +29,19 @@ const SignInScreen = ({ navigation }) => {
     }
   };
 
-  const onLogoutClicked = async () => {
-    try {
-      // 1. check if a user is currently logged in
-      if (auth.currentUser === null) {
-        alert('Sorry, no user is logged in.');
-      } else {
-        await signOut(auth);
-        alert('Logout complete!');
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const onLogoutClicked = async () => {
+  //   try {
+  //     // 1. check if a user is currently logged in
+  //     if (auth.currentUser === null) {
+  //       alert('Sorry, no user is logged in.');
+  //     } else {
+  //       await signOut(auth);
+  //       alert('Logout complete!');
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -74,11 +74,11 @@ const SignInScreen = ({ navigation }) => {
           Create an account
         </Text>
       </Pressable>
-      {<Pressable style={styles.btn}>
+      {/* {<Pressable style={styles.btn}>
         <Text style={styles.btnLabel} onPress={onLogoutClicked}>
           Logout
         </Text>
-      </Pressable> }
+      </Pressable> } */}
     </View>
   );
 };

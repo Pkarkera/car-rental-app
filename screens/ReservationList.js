@@ -1,71 +1,77 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  TextInput,
-  FlatList,
-  Image,
-} from 'react-native';
-
-import { useEffect, useState } from 'react';
-
-// 1. Import the db variable from firebaseConfig
+// Import necessary components and functions
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Pressable, FlatList, Image, Alert } from 'react-native';
 import { db } from '../firebaseConfig';
-
-// 2. Import the relevant functions from firestore
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ReservationList = () => {
   const [carBookingList, setCarBookingList] = useState([]);
 
-  useEffect(() => {
-    getUserCarBooking();
-  }, []);
+  // useEffect(() => {
+  //   getUserCarBooking();
+  //   console.log('component render')
+  // }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getUserCarBooking();
+      console.log('Screen is focused');
+      return () => {
+        // Cleanup or additional logic when the screen loses focus
+      };
+    }, [])
+  );
 
   const getUserCarBooking = async () => {
-    // retrieve data from firestore
     try {
       const querySnapshot = await getDocs(collection(db, 'user'));
-
       const resultsFromFirestore = [];
+
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, ' => ', doc.data());
-        // make the object to add to the array
         const itemToAdd = {
           id: doc.id,
           ...doc.data(),
         };
-        // append to array
-        // resultsFromFirestore.push(itemToAdd)
-
-        resultsFromFirestore.push(doc.data());
+        resultsFromFirestore.push(itemToAdd);
       });
 
-      console.log('What is in our final array');
-      console.log(resultsFromFirestore);
-
-      // save data to a state variable
-      // when the state variable updates, the list will auto update
-      setCarBookingList(resultsFromFirestore);
+      //setCarBookingList(resultsFromFirestore);
+      // console.log('resultsFromFirestore', resultsFromFirestore)
+      const updatedCarBookingList = resultsFromFirestore.filter((car) => car.bookingStatus !== 'green');
+      setCarBookingList(updatedCarBookingList);
     } catch (err) {
       console.log(err);
     }
   };
 
+  const handleBookNow = async (bookingId) => {
+    try {
+      const userDocRef = doc(db, 'user', bookingId);
+      await updateDoc(userDocRef, {
+        bookingStatus: 'green', // Update to the desired status
+      });
+
+      Alert.alert('Success', 'Car booked successfully!');
+      getUserCarBooking();
+      // Filter out the booked car from the list
+      setCarBookingList((prevList) => prevList.filter((car) => car.id !== bookingId));
+    } catch (err) {
+      console.log(err);
+      Alert.alert('Error', 'Failed to book the car. Please try again.');
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* // List UI goes here */}
       <FlatList
         data={carBookingList}
-        renderItem={(rowData) => {
+        renderItem={({ item }) => {
           return (
-            <View
-              style={{ borderBottomWidth: 1, flexDirection: 'row', gap: 7 }}
-            >
+            <View style={{ borderBottomWidth: 1, flexDirection: 'row', gap: 7 }}>
               <View>
                 <Image
-                  source={{ uri: rowData.item.photo }}
+                  source={{ uri: item.photo }}
                   style={{
                     width: 75,
                     height: 75,
@@ -76,34 +82,39 @@ const ReservationList = () => {
               </View>
               <View>
                 <Text style={{ fontSize: 18, fontWeight: '700' }}>
-                  {rowData.item.name}
+                  {item.name}
                 </Text>
-                <Text>Price: ${rowData.item.price}</Text>
-                <Text>License PLate: {rowData.item.licensePlate}</Text>
-                <Text>Type: {rowData.item.type}</Text>
-                <Text>Date: {rowData.item.bookingDate}</Text>
-                {rowData.item.bookingStatus == 'yellow' && (
-                  <Text>
-                    Status:{' '}
-                    <Text style={{ color: 'blue', fontSize: 20 }}>Pending</Text>
-                  </Text>
-                )}
-                {rowData.item.bookingStatus == 'green' && (
-                  <Text>
-                    <Text style={{ color: 'green', fontSize: 20 }}>
-                      Approve
-                    </Text>
-                  </Text>
-                )}
-                {rowData.item.bookingStatus == 'red' && (
-                  <Text>
-                    <Text style={{ color: 'red', fontSize: 20 }}>Decline</Text>
+                <Text>Price: ${item.price}</Text>
+                <Text>License Plate: {item.licensePlate}</Text>
+                <Text>Type: {item.type}</Text>
+                <Text>Date: {item.bookingDate}</Text>
+                {item.bookingStatus === 'yellow' && (
+                  <Text style={{marginVertical: 10}}>
+                    <Pressable
+                      style={{
+                        // borderWidth: 1,
+                        borderColor: '#141D21',
+                        borderRadius: 8,
+                        paddingVertical: 4,
+                        paddingHorizontal: 8, 
+                        // marginVertical: 10,
+                        backgroundColor: 'green',
+                        justifyContent: 'center', 
+                        alignItems: 'center',
+                      }}
+                      onPress={() => handleBookNow(item.id)}
+                    >
+                      <Text style={{ fontSize: 16, textAlign: 'center', fontWeight: '700', color: 'white' }}>
+                        Book Now
+                      </Text>
+                    </Pressable>
                   </Text>
                 )}
               </View>
             </View>
           );
         }}
+       keyExtractor={(item) => item.id.toString()}
       />
     </View>
   );

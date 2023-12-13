@@ -10,6 +10,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import ReservationList from './screens/ReservationList';
 import SearchStackNavContainer from './components/SearchStackNavContainer';
 
+//import CheckoutScreen from '../screens/CheckoutScreen';
 
 //to obtain instance of navigation stack
 const Tab = createBottomTabNavigator();
@@ -45,7 +46,9 @@ export default function App() {
             tabBarInactiveTintColor: 'gray',
             tabBarActiveTintColor: 'black',
           }}
+          
         ></Tab.Screen>
+       
       </Tab.Navigator>
     </NavigationContainer>
   );
