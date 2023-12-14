@@ -10,9 +10,9 @@ import {
   Modal,
 } from 'react-native';
 import * as Location from 'expo-location';
-import { ScrollView } from 'react-native-gesture-handler';
+//import { ScrollView } from 'react-native-gesture-handler';
 import MapView, { Marker } from 'react-native-maps';
-// Change these import statements in SearchScreen.js and App.js
+
 
 // import the db variable from firebaseConfig.js
 import { db } from '../firebaseConfig';
@@ -28,33 +28,6 @@ import {
   query,
   initializeFirestore,
 } from 'firebase/firestore';
-
-const MARKERS_ARRAY = [
-  {
-    name: 'Porsche_Panamera_4_E-Hybrid_PHEV_2023_CA',
-    rentalPrice: '320',
-    type: 'passenger',
-    licensePlate: 'AXS878',
-    coordinates: {
-      lat: 37.39307598185042,
-      lng: -122.07068483025209,
-    },
-    photo:
-      'https://assets.zappyride.com/img/vehicles/chromestyle/432740/style-set-1280/2023PRC130001_1280_01.png',
-  },
-  {
-    name: 'Tesla_Model_3_Long_Range_AWD_BEV_2023_CA',
-    rentalPrice: '200',
-    type: 'passenger',
-    licensePlate: 'LOP778',
-    coordinates: {
-      lat: 37.38965324014396,
-      lng: -122.07986566136022,
-    },
-    photo:
-      'https://assets.zappyride.com/img/vehicles/chromestyle/426158/style-set-1280/2022TSC030022_1280_01.png',
-  },
-];
 
 const SearchScreen = () => {
   // state variables to store results of geocoding
@@ -73,8 +46,8 @@ const SearchScreen = () => {
   const [carData, setCarData] = useState([]);
   const [carDataIsFetched, setCarDataIsFetched] = useState(false);
 
-  const [cityLat, setCityLat] = useState(0); //37.7749;
-  const [cityLng, setCityLng] = useState(0); //-122.4194;
+  // const [cityLat, setCityLat] = useState(0); //37.7749;
+  // const [cityLng, setCityLng] = useState(0); //-122.4194;
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -82,43 +55,10 @@ const SearchScreen = () => {
 
   useEffect(() => {
     getCurrentLocation();
-    doReverseGeocode();
+    //doReverseGeocode();
     getAllData();
     // getCarDataFromDb();
   }, []);
-
-  const getCarDataFromDb = async () => {
-    console.log('ok');
-    // 1. get the search key from the textbox
-    // 2. Build a query using that search key
-    const q = query(
-      collection(db, 'Listings'),
-      where('address', '==', carCity)
-    );
-
-    // const q = query(collection(db, "students"), where("gpa", ">=", 2.5));
-
-    // 3. execute the query
-    try {
-      const querySnapshot = await getDocs(q);
-
-      // 1. make temp array for this results
-      let temp = [];
-      querySnapshot.forEach((doc) => {
-        temp.push({
-          id: doc.id,
-          ...doc.data(),
-        });
-      });
-      // 2. update the state variable with the contents of the temp array
-      setCarData(temp);
-
-      // console.log(`====>>> ${JSON.stringify(temp)}`);
-
-      // console.log('ok');
-      // console.log(`+++++++++++++++++${temp}`);
-    } catch (err) {}
-  };
 
   const getAllData = async () => {
     // alert('OK!');
@@ -139,7 +79,7 @@ const SearchScreen = () => {
         resultsFromFirestore.push(itemToAdd);
       });
 
-      console.log('What is in our final array');
+      //console.log('What is in our final array');
       // console.log(resultsFromFirestore);
       setCarData(resultsFromFirestore);
     } catch (err) {
@@ -149,18 +89,18 @@ const SearchScreen = () => {
 
   const clickMe = (car) => {
     // console.log('MAP MARKER CLICKED');
-    // console.log(car.name);
+    console.log(car.name);
     setCarDetail(car);
 
     setModalOpen(true);
   };
 
-  function getRandomDate(startDate, endDate) {
-    const timeDiff = endDate.getTime() - startDate.getTime();
-    const randomTime = Math.random() * timeDiff;
-    const randomDate = new Date(startDate.getTime() + randomTime);
-    return randomDate.toISOString().slice(0, 10);
-  }
+     function getRandomDate(startDate, endDate) {
+     const timeDiff = endDate.getTime() - startDate.getTime();
+     const randomTime = Math.random() * timeDiff;
+     const randomDate = new Date(startDate.getTime() + randomTime);
+     return randomDate.toISOString().slice(0, 10);
+   }
 
   const bookCarToRent = async () => {
     // yyyy-mm-dd
@@ -185,9 +125,7 @@ const SearchScreen = () => {
         collection(db, 'user'),
         saveCarInUserDb
       );
-      // display success message
-      // console.log('Document written with ID: ', insertedDocument.id);
-      // console.log(`done! ${insertedDocument.id}`);
+      
     } catch (err) {
       console.log(err);
     }
@@ -224,46 +162,11 @@ const SearchScreen = () => {
     }
   };
 
-  // helper function to do reverse geocoding (coordinates to address)
-  const doReverseGeocode = async () => {
-    // alert('reverse geocode button clicked');
-    try {
-      // 0. on android, permissions must be granted
-      // 1. do geocoding
-      const coords = {
-        latitude: parseFloat(latFromUI),
-        longitude: parseFloat(lngFromUI),
-      };
-      // 2. check if result found
-      const postalAddresses = await Location.reverseGeocodeAsync(coords, {});
-
-      const result = postalAddresses[0];
-      if (result === undefined) {
-        // alert('No results found.');
-        return;
-      }
-      // console.log(result.city);
-      setCarCity(result.city);
-      // alert(JSON.stringify(result));
-
-      // 3. do something with results
-
-      // output the street address and number to the user interace
-      const output = `${result.streetNumber} ${result.street}, ${result.city}, ${result.region}`;
-      // save it to a state variable to display on screen
-      setCurrAddress(output);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   // button click handler
 
   return (
     <View style={styles.container}>
       <View>
-        <Text>{latFromUI}</Text>
-
         <MapView
           style={{ height: '100%', width: '100%' }}
           region={{
@@ -276,15 +179,7 @@ const SearchScreen = () => {
           {
             // loop through the markers array
             carData.map(
-              // currItemInArray == the current item we are iterating over
-              // pos = position in the array
               (currItem, pos) => {
-                // for each item in the array, execute this function code
-                // - build a marker element
-                // DEBUG
-                // console.log(`Loop iteration: ${pos}`);
-                // console.log(currItem);
-
                 const coords = {
                   latitude: currItem.coordinates.lat,
                   longitude: currItem.coordinates.lng,
@@ -293,13 +188,10 @@ const SearchScreen = () => {
                   <Marker
                     key={pos}
                     coordinate={coords}
-                    // title={currItem.price}
-                    // description={currItem.city}
                     onPress={() => {
                       clickMe(currItem);
                     }}
                   >
-                    {/* // UI for your customer marker */}
                     <View
                       style={{
                         borderColor: 'black',

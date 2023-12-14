@@ -18,7 +18,7 @@ const SignInScreen = ({ navigation }) => {
         password
       );
       // who is the current user?
-      console.log('Who is the currently logged in user');
+      //console.log('Who is the currently logged in user');
       // console.log(auth.currentUser);
       // alert(`Login success! ${auth.currentUser.uid}`);
       navigation.navigate('Cars Found');
@@ -28,20 +28,6 @@ const SignInScreen = ({ navigation }) => {
       console.log(err);
     }
   };
-
-  // const onLogoutClicked = async () => {
-  //   try {
-  //     // 1. check if a user is currently logged in
-  //     if (auth.currentUser === null) {
-  //       alert('Sorry, no user is logged in.');
-  //     } else {
-  //       await signOut(auth);
-  //       alert('Logout complete!');
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
 
   return (
     <View style={styles.container}>
@@ -74,11 +60,6 @@ const SignInScreen = ({ navigation }) => {
           Create an account
         </Text>
       </Pressable>
-      {/* {<Pressable style={styles.btn}>
-        <Text style={styles.btnLabel} onPress={onLogoutClicked}>
-          Logout
-        </Text>
-      </Pressable> } */}
     </View>
   );
 };

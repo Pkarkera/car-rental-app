@@ -1,24 +1,21 @@
 // Import necessary components and functions
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, Pressable, FlatList, Image, Alert } from 'react-native';
+import PaymentForm from './PaymentForm'; 
 import { db } from '../firebaseConfig';
 import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 
 const ReservationList = () => {
   const [carBookingList, setCarBookingList] = useState([]);
-
-  // useEffect(() => {
-  //   getUserCarBooking();
-  //   console.log('component render')
-  // }, []);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useFocusEffect(
     React.useCallback(() => {
       getUserCarBooking();
       console.log('Screen is focused');
       return () => {
-        // Cleanup or additional logic when the screen loses focus
+
       };
     }, [])
   );
@@ -36,8 +33,6 @@ const ReservationList = () => {
         resultsFromFirestore.push(itemToAdd);
       });
 
-      //setCarBookingList(resultsFromFirestore);
-      // console.log('resultsFromFirestore', resultsFromFirestore)
       const updatedCarBookingList = resultsFromFirestore.filter((car) => car.bookingStatus !== 'green');
       setCarBookingList(updatedCarBookingList);
     } catch (err) {
@@ -45,21 +40,31 @@ const ReservationList = () => {
     }
   };
 
-  const handleBookNow = async (bookingId) => {
+  const handleBookNow = (bookingId) => {
+    setSelectedBooking(bookingId);
+  };
+
+  const handlePaymentSuccess = async (paymentDetails) => {
     try {
-      const userDocRef = doc(db, 'user', bookingId);
+      const userDocRef = doc(db, 'user', selectedBooking);
       await updateDoc(userDocRef, {
-        bookingStatus: 'green', // Update to the desired status
+        bookingStatus: 'green',
+        paymentDetails: {
+          
+        },
       });
 
       Alert.alert('Success', 'Car booked successfully!');
       getUserCarBooking();
-      // Filter out the booked car from the list
-      setCarBookingList((prevList) => prevList.filter((car) => car.id !== bookingId));
+      setSelectedBooking(null);
     } catch (err) {
       console.log(err);
       Alert.alert('Error', 'Failed to book the car. Please try again.');
     }
+  };
+
+  const handlePaymentCancel = () => {
+    setSelectedBooking(null);
   };
 
   return (
@@ -89,17 +94,16 @@ const ReservationList = () => {
                 <Text>Type: {item.type}</Text>
                 <Text>Date: {item.bookingDate}</Text>
                 {item.bookingStatus === 'yellow' && (
-                  <Text style={{marginVertical: 10}}>
+                  <Text style={{ marginVertical: 10 }}>
                     <Pressable
                       style={{
-                        // borderWidth: 1,
                         borderColor: '#141D21',
                         borderRadius: 8,
+                        borderWidth: 1,
                         paddingVertical: 4,
-                        paddingHorizontal: 8, 
-                        // marginVertical: 10,
+                        paddingHorizontal: 8,
                         backgroundColor: 'green',
-                        justifyContent: 'center', 
+                        justifyContent: 'center',
                         alignItems: 'center',
                       }}
                       onPress={() => handleBookNow(item.id)}
@@ -114,8 +118,12 @@ const ReservationList = () => {
             </View>
           );
         }}
-       keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
       />
+
+      {selectedBooking && (
+        <PaymentForm onSuccess={handlePaymentSuccess} onCancel={handlePaymentCancel} />
+      )}
     </View>
   );
 };
